@@ -2,3 +2,6 @@
 REVIEW-astra-mid.md
 REVIEW-*.md
 .DS_Store
+
+# local regen backups
+projects/**/rough/_prev/
