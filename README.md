@@ -9,35 +9,44 @@
 | 領域 | 担当 | やること | やらないこと |
 | --- | --- | --- | --- |
 | 企画の核 | 人 | 誰に届けるか、一言の主題、触れてはいけない線 | AI に主題を決めさせない |
-| あらすじ | 人→AI下書き→人確定 | 人が骨、AIが候補、人が採用 | AI案を無検証で本文にしない |
+| あらすじ | 人（主題・欲しい場面・感触）→AI拍候補可→人確定 | 人が核、AIが拍候補、人が採用 | AI案を無検証で本文にしない |
 | 本文 | AI下書き→人確定 | 短い文・音読リズム・年齢語彙の候補 | 最終文言の署名は人 |
 | ページ割り・間 | 人 | めくりの間、余白、文なし頁 | 文量でページを埋めない |
 | キャラ・世界観 | 人 | 見た目のルールの一貫 | ページごとに別人にしない |
 | ラフ〜本番絵 | 人（主） | 構図・表情・手触り | 「きれいな一枚」だけで物語を捨てない |
-| ビジュアル案出し | AI可 | 構図・小物・背景の参照候補 | 方針なく AI 出力を最終納品しない |
+| ビジュアル案出し | AI可（brief の AI 範囲内） | 構図・小物・背景の参照候補 | 方針なく AI 出力を最終納品しない |
 | 対象年齢・倫理 | 人 | 恐怖・差別・危険行為の扱い | 「AIが言ったからOK」にしない |
 | 権利・表示 | 人 | 素材・フォント・AI使用の開示 | 曖昧な二次利用を残さない |
 
-## 工程技能（この順で使う）
+## 基本順序と戻り先
 
-| 順 | 技能ディレクトリ | いつ使うか |
+直線の強制ではなく、**基本順**と、詰まったときの**戻り先**。
+
+| 順 | 技能ディレクトリ | いつ使うか / 戻り先 |
 | --- | --- | --- |
 | 0 | `picture-book-orchestrator` | 全体の案内・次工程の選択 |
-| 1 | `picture-book-brief` | 主題・対象年齢・禁止線 |
-| 2 | `picture-book-synopsis` | あらすじ 3〜5 拍 |
-| 3 | `picture-book-pagination` | ページ表 |
-| 4 | `picture-book-prose` | 本文ドラフトと音読直し |
-| 5 | `picture-book-character` | キャラシート |
-| 6 | `picture-book-rough` | 全頁ラフ |
-| 7 | `picture-book-visual-refs` | （任意）AI 参照画像 |
-| 8 | `picture-book-final-art` | 本番イラストと一貫性 |
-| 9 | `picture-book-readthrough` | 通し読み・倫理 |
-| 10 | `picture-book-rights-export` | 権利・開示・書き出し |
+| 1 | `picture-book-brief` | 主題・対象年齢・禁止線・媒体暫定・売りの型。ぶれたらここへ戻る |
+| 2 | `picture-book-synopsis` | あらすじ 3〜5 拍（人が核を出し、AI が拍候補を出してよい） |
+| 3 | `picture-book-pagination` | ページ表。prose / rough と反復してよい |
+| 4 | `picture-book-prose` | 本文ドラフトと音読直し。pagination / rough と反復可 |
+| 5 | `picture-book-character` | キャラシート（rough と並行可。本番前に確定） |
+| 6 | `picture-book-rough` | 全頁ラフ。途中で visual-refs 可。pagination / prose へ戻ってよい |
+| 7 | `picture-book-visual-refs` | （任意）AI 参照画像。rough 途中でも呼び出し可 |
+| 8 | `picture-book-final-art` | 本番イラスト。**開始前に** prose・character・rough が確定 |
+| 9 | `picture-book-readthrough` | 二相: (A) ラフ+仮文 / (B) 本番絵+本文確定後 |
+| 10 | `picture-book-rights-export` | 権利追跡と書き出しチェック |
+| 11 | `picture-book-epub` | （任意）Kindle 向け EPUB。rights-export のあと、brief で選んだとき |
+| 12 | `picture-book-youtube` | （任意）ページ同期＋TTS の YouTube 向け動画。rights-export のあと |
+
+`rights-export` のあとは **分岐**: 印刷納品のみで終わる／`epub`／`youtube`／両方。brief の公開チャネル（Kindle・YouTube）が開始条件。
 
 各ディレクトリの `SKILL.md` が正本。共有の単一巨大スキルにはしない。
+
+成果物の状態語彙（`下書き`／`人の確認待ち`／`確定`／`要再確認`）、版・参照、上流変更時の下流再確認、**AI による人承認の捏造禁止**は `.agents/skills/_shared/process-state.md` を正本とする。
 
 ## やらないこと
 
 - 文も絵も AI 任せのワンショット量産
 - 既存絵本の筋・固有名の再現
+- 人の確認なしに成果物を「確定」と書く（`process-state.md`）
 - 依頼されていない他組織・他リポジトリへの干渉

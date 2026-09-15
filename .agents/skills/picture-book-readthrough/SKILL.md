@@ -1,28 +1,46 @@
 ---
 name: picture-book-readthrough
 description: >-
-  Use this after final art for dual read-throughs (child role and caregiver role)
-  and ethics pass before export.
+  Use in two phases: (A) rough+temp text before final art, (B) final art+final
+  text; record who judged fatal issues, status, and re-check after fixes.
 ---
 
 # 工程9: 通し読み・倫理
 
+状態は `_shared/process-state.md` に従う。**二相**で再利用する。
+
 ## 担当
 
-- **人:** 子ども役／保護者役の二回読み、倫理判断（必須）
-- **AI:** つまずき箇所の列挙補助は可。OK/NG の最終は人
+- **人:** 子ども役／保護者役の読み、倫理判断、致命的の判定者（必須）
+- **AI:** つまずき箇所の列挙補助は可。OK/NG・致命的の最終は人
 
-## 手順
+## 前提
+
+| 相 | 開始条件 | 目的 |
+| --- | --- | --- |
+| **A** | ラフ一式＋仮文（prose 下書き以上） | 本番前に間・怖さ・文の粗を潰す |
+| **B** | 本番絵＋本文確定 | 出荷／納品前の最終通し |
+
+orchestrator は A を rough 前後、B を final-art 後に案内する。
+
+## 手順（各相共通）
 
 1. 子ども役で音読（速さ・意味の飛び）。
 2. 保護者役で読む（怖さ、差別、危険模倣、説教臭）。
-3. 引っかかりを `readthrough.md` に書き、prose／絵に差し戻す。
-4. brief の禁止線を再チェックする。
+3. 引っかかりを `readthrough.md` に書き、相（A/B）、日時、**誰が「致命的」と判断したか**、各指摘の **状態**（未着手／修正済／受容）を残す。
+4. 修正したら **再チェック**し、致命的が残っていないことを記録する。
+5. brief の禁止線を再チェックする。
+6. 差し戻し先（prose / rough / final-art 等）の成果物を `要再確認` にする。
 
 ## 完了条件
 
-- 二回読みの記録と、致命的指摘が未解決のまま残っていない
+- 実施した相について二回読みの記録がある
+- 致命的指摘の判定者と、修正後再チェックの結果が残っている
+- 相 B を出荷条件にする場合、致命的が未解決のまま残っていない
+- 相 A のみでは rights-export に進まない
 
 ## やらないこと
 
 - 「AIが問題なしと言った」だけで通す
+- 致命的の判定者・状態・再チェックを残さずに完了にする
+- 相 A の通過を相 B の代替にする

@@ -1,28 +1,58 @@
 ---
 name: picture-book-final-art
 description: >-
-  Use this after roughs (and optional refs) for production illustration and
-  consistency checks across pages — illustrator-owned.
+  Use this after prose, character, and rough are locked for production art,
+  baseline-ref checks, checklist/diff log, and defined AI assist while human draws.
 ---
 
 # 工程8: 本番イラスト
 
+状態は `_shared/process-state.md` に従う。
+
 ## 担当
 
-- **人（イラストレーター）:** 本番絵と一貫性
-- **AI:** brief で明示した範囲以外は最終画素を担わない
+- **人（イラストレーター）:** 本番絵と一貫性、チェックリスト消化
+- **AI:** brief で明示した範囲内の補助のみ。人が描いているあいだの役割は下表。最終画素の署名は人（方針で明示した場合を除く）
+
+### 人が描いているあいだ AI がしてよいこと
+
+- キャラシート／ベースライン参照との差分指摘
+- 頁間トーン・色・比率の逸脱リスト
+- 文と絵の衝突（文字下沈み等）の洗い出し
+- チェックリスト／差分ログの下書き
+
+### AI がしないこと
+
+- 無断で最終イラストを差し替える
+- 「確定」や人の承認を代筆する
+
+## 前提
+
+### 開始条件（必須）
+
+次がすべて **確定**（character は N/A 確定可）:
+
+- `prose.md`
+- `character.md`（または N/A）
+- rough（`rough-notes.md` およびラフ実体）
+
+キャラが存在するなら、character の **ビジュアル・ベースライン参照**（または例外記録）があること。
 
 ## 手順
 
 1. ラフに沿って本番を進める。
-2. キャラシート照合（服・耳・色・比率）。
+2. キャラシートおよびベースライン参照と照合（服・耳・色・比率）。例外は理由を残す。
 3. ページ間の光・線の太さ・トーンを揃える。
 4. 文との衝突（重要ディテールが文字下に沈む等）を潰す。
+5. **チェックリスト／差分ログ**を残す（例: 頁ごと OK/差分、参照からの逸脱、未解消）。
 
 ## 完了条件
 
 - 全頁の本番が揃い、一貫性チェックを通っている
+- チェックリスト／差分ログがある
+- ベースライン参照との関係（準拠／例外）が記録されている
 
 ## やらないこと
 
 - 「きれい」優先で物語の間やキャラ同一性を壊す
+- prose / character / rough 未確定のまま本番を「完了」にする

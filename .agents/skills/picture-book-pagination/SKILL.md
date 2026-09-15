@@ -2,10 +2,12 @@
 name: picture-book-pagination
 description: >-
   Use this after synopsis lock to build a page table: what the art shows, whether
-  text exists, and page-turn timing — human-owned pacing.
+  text exists, and page-turn timing — human-owned pacing; may iterate with prose/rough.
 ---
 
 # 工程3: ページ表
+
+状態は `_shared/process-state.md` に従う。
 
 ## 担当
 
@@ -14,20 +16,23 @@ description: >-
 
 ## 前提
 
-`synopsis.md` 確定済み。
+`synopsis.md` 確定済み。brief の総頁・数え方・表紙扱いに従う。
 
 ## 手順
 
-1. 総頁を brief に合わせる。
+1. 総頁を brief に合わせる（数え方・表紙を再確認）。
 2. 各頁に書く: 頁番号、絵で見せること、文の有無、めくりの効き。
 3. 文なし頁を意図的に残してよいか確認する。
 4. 説明過多の頁を削る／分割する。
+5. prose・rough で破綻したらここへ戻り、状態を `要再確認` → 再確定する。
 
 ## 完了条件
 
 - `pagination.md` に全頁が埋まり、あらすじの拍と対応している
 - 「文量で埋めただけ」の頁がない
+- 人が確定したことが記録されている（prose/rough 反復中は `下書き` でも開始可）
 
 ## やらないこと
 
 - 本文完成前に本番彩色に入る
+- pagination を凍結したまま prose/rough の矛盾を放置する

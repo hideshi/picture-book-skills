@@ -1,20 +1,23 @@
 ---
 name: picture-book-prose
 description: >-
-  Use this after pagination to draft page text with AI candidates, then human
-  read-aloud editing for rhythm, age vocabulary, and final wording.
+  Use this after pagination to draft page text with AI candidates, separate
+  adopted vs rejected lines, lock narrator/tense/names/refrains, and run a
+  whole-book voice pass — human read-aloud owns final wording.
 ---
 
 # 工程4: 本文
 
+状態は `_shared/process-state.md` に従う。
+
 ## 担当
 
-- **AI:** 頁番号つき本文候補（各頁 1–3 案まで）
-- **人:** 音読、語彙、優しさ、最終文言の署名
+- **AI:** 頁番号つき本文候補（各頁 1–3 案まで）、声の一貫性チェック補助
+- **人:** 音読、語彙、優しさ、最終文言の署名、採用／不採用の仕分け
 
 ## 前提
 
-`pagination.md` 完了。`brief.md` の年齢・禁止線を守る。
+`pagination.md` がある（確定推奨。反復中の下書きでも作業開始可）。`brief.md` の年齢・禁止線を守る。
 
 ## AI への制約
 
@@ -24,15 +27,24 @@ description: >-
 
 ## 手順
 
-1. ページ表と確定あらすじを渡して候補生成。
-2. 人が音読して直す（子どもがつまずく箇所を優先）。
-3. 頁の文と絵の主役分担をメモする（絵が主役なら文は最小）。
+1. **声のルールを先に決める**（人が採否）: 語り手（一人称／三人称／地の文のみ）、時制、キャラ名・呼び方、リフレイン（反復句）の有無と文言。
+2. ページ表と確定あらすじを渡して候補生成。
+3. **採用案と不採用案を分ける**（混在させない。不採用は短い理由つきで残してよい）。
+4. 人が音読して直す（子どもがつまずく箇所を優先）。
+5. 頁の文と絵の主役分担をメモする（絵が主役なら文は最小）。
+6. **全书声・一貫性パス:** 語り手・時制・名前・リフレイン・トーンが頁をまたいで破綻していないか通しで見る。
+7. pagination / rough と矛盾したら差し戻し、上流を `要再確認` にする。
 
 ## 完了条件
 
 - `prose.md` がページ表と一致
+- 声のルール（語り手／時制／名前／リフレイン）が明記されている
+- 採用と不採用が分離されている
 - 人が通しで音読して詰まらない
+- final-art に進む前は状態が `確定`
 
 ## やらないこと
 
 - AI 出力を読み上げずに確定する
+- 不採用候補を本文正本に混ぜたままにする
+- 全书の声を頁単位の局所直しだけで終わらせる
