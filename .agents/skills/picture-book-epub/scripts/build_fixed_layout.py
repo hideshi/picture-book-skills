@@ -407,7 +407,7 @@ def package_epub(
   </ol></nav>
   <nav epub:type="landmarks" hidden=""><h2>ランドマーク</h2><ol>
     <li><a epub:type="cover" href="cover.xhtml">表紙</a></li>
-    <li><a epub:type="bodymatter" href="{body_id}.xhtml">本文開始</a></li>
+    <li><a epub:type="bodymatter" href="cover.xhtml">本文開始</a></li>
   </ol></nav>
 </body>
 </html>"""
@@ -454,7 +454,7 @@ def package_epub(
   </spine>
   <guide>
     <reference type="cover" title="表紙" href="cover.xhtml"/>
-    <reference type="text" title="本文" href="{body_id}.xhtml"/>
+    <reference type="text" title="本文" href="cover.xhtml"/>
   </guide>
 </package>"""
         (oebps / "package.opf").write_text(package, encoding="utf-8")
