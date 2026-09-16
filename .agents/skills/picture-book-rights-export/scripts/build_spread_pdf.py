@@ -18,6 +18,7 @@ def render_print_html(project, *, embed_images: bool = False, relative_to: Path 
     cover_uri = image_uri(project.cover, embed=embed_images, relative_to=relative_to)
     sheets = [
         f"""<section class="sheet cover-sheet">
+  <div class="cover-title"><h1>{html.escape(project.title)}</h1><p>作・構成　{html.escape(project.author)}</p></div>
   <img src="{cover_uri}" alt="{html.escape(project.title)}の表紙"/>
 </section>"""
     ]
@@ -49,8 +50,11 @@ html,body {{ margin:0; padding:0; font-family:"Noto Serif CJK JP","Yu Mincho",se
 .page-number {{ position:absolute; bottom:4mm; color:#888; font:8pt sans-serif; }}
 .left .page-number {{ left:10mm; }} .right .page-number {{ right:10mm; }}
 .blank {{ background:#f7f4ee; }}
-.cover-sheet {{ display:flex; align-items:center; justify-content:center; }}
-.cover-sheet img {{ max-width:90%; max-height:190mm; object-fit:contain; }}
+.cover-sheet {{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5mm; }}
+.cover-title {{ width:100%; text-align:center; }}
+.cover-title h1 {{ margin:0; font-size:28pt; font-weight:700; }}
+.cover-title p {{ margin:3mm 0 0; font-size:14pt; color:#444; }}
+.cover-sheet img {{ max-width:90%; max-height:160mm; object-fit:contain; }}
 </style>
 </head>
 <body>{"".join(sheets)}</body>
