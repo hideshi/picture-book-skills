@@ -39,6 +39,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("project_dir", nargs="?", default=".")
     result.add_argument("--art-dir")
     result.add_argument("--cover")
+    result.add_argument("--cover-text-mode", choices=("overlay", "embedded", "none"), default="overlay")
     result.add_argument("--output-dir")
     result.add_argument("--title")
     result.add_argument("--author")
@@ -126,6 +127,7 @@ def main() -> None:
         }
         for command in commands.values():
             add_common_options(command, args)
+        commands["epub"].extend(["--cover-text-mode", args.cover_text_mode])
         if args.embed_html_images:
             commands["viewer_html"].append("--embed-images")
             commands["spread_html"].append("--embed-images")

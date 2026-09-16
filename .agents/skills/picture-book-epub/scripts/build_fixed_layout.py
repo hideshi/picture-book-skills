@@ -219,6 +219,7 @@ def render_pages(
     regular_font_path: Path,
     bold_font_path: Path,
     disclosure: list[str],
+    cover_text_mode: str,
 ) -> list[tuple[str, Path, str, str, str]]:
     rendered_dir.mkdir(parents=True, exist_ok=True)
     for stale in rendered_dir.glob("page_*.png"):
@@ -236,19 +237,27 @@ def render_pages(
     image_box = (round(width * 0.944), round(height * 0.599))
     margin = round(width * 0.055)
 
-    cover_canvas = Image.new("RGB", (width, height), BACKGROUND)
-    cover_draw = ImageDraw.Draw(cover_canvas)
-    title_lines = wrap_text(cover_draw, title, title_font, width - 2 * margin)
-    y = round(height * 0.07)
-    for line in title_lines:
-        box = cover_draw.textbbox((0, 0), line, font=title_font)
-        cover_draw.text(((width - (box[2] - box[0])) / 2, y), line, font=title_font, fill=(24, 24, 24))
-        y += round(title_font.size * 1.25)
-    author_text = f"作・構成　{author}"
-    box = cover_draw.textbbox((0, 0), author_text, font=author_font)
-    cover_draw.text(((width - (box[2] - box[0])) / 2, y + round(20 * scale)), author_text, font=author_font, fill=(70, 70, 70))
-    cover_art = fit_image(cover_path, *image_box)
-    cover_canvas.paste(cover_art, ((width - cover_art.width) // 2, image_top + (image_box[1] - cover_art.height) // 2))
+    if cover_text_mode == "embedded":
+        cover_canvas = fit_image(cover_path, width, height)
+        if cover_canvas.size != (width, height):
+            page = Image.new("RGB", (width, height), BACKGROUND)
+            page.paste(cover_canvas, ((width - cover_canvas.width) // 2, (height - cover_canvas.height) // 2))
+            cover_canvas = page
+    else:
+        cover_canvas = Image.new("RGB", (width, height), BACKGROUND)
+        if cover_text_mode == "overlay":
+            cover_draw = ImageDraw.Draw(cover_canvas)
+            title_lines = wrap_text(cover_draw, title, title_font, width - 2 * margin)
+            y = round(height * 0.07)
+            for line in title_lines:
+                box = cover_draw.textbbox((0, 0), line, font=title_font)
+                cover_draw.text(((width - (box[2] - box[0])) / 2, y), line, font=title_font, fill=(24, 24, 24))
+                y += round(title_font.size * 1.25)
+            author_text = f"作・構成　{author}"
+            box = cover_draw.textbbox((0, 0), author_text, font=author_font)
+            cover_draw.text(((width - (box[2] - box[0])) / 2, y + round(20 * scale)), author_text, font=author_font, fill=(70, 70, 70))
+        cover_art = fit_image(cover_path, *image_box)
+        cover_canvas.paste(cover_art, ((width - cover_art.width) // 2, image_top + (image_box[1] - cover_art.height) // 2))
     rendered_cover = rendered_dir / "page_cover.png"
     cover_canvas.save(rendered_cover)
 
@@ -502,6 +511,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("project_dir", nargs="?", default=".")
     parser.add_argument("--art-dir", help="Final-art directory, relative to project by default")
     parser.add_argument("--cover", help="Dedicated cover image, relative to project by default")
+    parser.add_argument("--cover-text-mode", choices=("overlay", "embedded", "none"), default="overlay", help="Cover title handling: overlay generated title, preserve embedded cover design, or omit title")
     parser.add_argument("--output", help="Output EPUB; defaults to dist/<title>_固定レイアウト版.epub")
     parser.add_argument("--rendered-dir", help="Intermediate rendered pages; defaults to rendered_pages/")
     parser.add_argument("--title")
@@ -573,6 +583,7 @@ def main() -> None:
         regular_font,
         bold_font,
         disclosure,
+        args.cover_text_mode,
     )
     package_epub(
         entries,
