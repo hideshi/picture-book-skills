@@ -21,7 +21,7 @@ description: >-
 
 ## 手順
 
-1. 入力の有無を確認する（対象年齢、一言主題、禁止線、頁数目安、絵のトーン、AIに任せる範囲、買い手／納品の型）。
+1. 入力の有無を確認する（対象年齢、一言主題、禁止線、頁数目安、絵のトーン、AIに任せる範囲と画像運用モード、ビジュアル一貫性ポリシー、買い手／納品の型）。
 2. 未確定なら `picture-book-brief` から始める。
 3. **開始条件**と**確定条件**を分けて次を選ぶ（下表）。反復してよいループを直線に強制しない。
 4. 上流を直したら下流を `要再確認` にする（`process-state.md`）。
@@ -34,16 +34,16 @@ description: >-
 | 工程 | 開始してよい条件 | 確定して次の本番系へ進む条件 |
 | --- | --- | --- |
 | synopsis | brief が人の確認可能な核を持つ | synopsis **確定** |
-| pagination | synopsis 確定 | pagination 確定（ただし prose/rough と反復可） |
+| pagination | synopsis 確定 | pagination 確定（ただし prose/rough と反復可）。可変の舞台・配置と必要なカバーも割当済み |
 | prose | pagination の下書き以上がある | prose **確定**（final-art 前） |
-| character | brief 以降いつでも可 | character **確定**（final-art 前。キャラ無しは N/A） |
-| rough | prose・character の下書き以上で開始可 | rough **確定**（final-art 前）。途中で visual-refs 可 |
+| character | brief 以降いつでも可 | 人物・場所・キー小道具の該当シート **確定**（N/A 可） |
+| rough | prose・character の下書き以上で開始可 | rough **確定**（final-art 前）。brief の画像運用モードと頁別採否を記録。途中で visual-refs 可 |
 | visual-refs | rough 作業中でも可（任意） | 使ったなら方針メモ。スキップ可 |
 | final-art | **prose・character・rough がすべて確定**（character は N/A 可） | 本番全頁＋チェックログ |
 | readthrough (A) | rough＋仮文が揃う | A 相の記録。致命的は差し戻し |
 | readthrough (B) | final-art＋本文確定 | B 相通過、致命的未解決なし |
 | rights-export | readthrough B 通過（または短いパス例外の記録あり） | 節Aクローズ＋節B（分岐前書き出し）の実ファイル検証。**最終 EPUB／最終動画そのものではない** |
-| epub（任意） | 節A＋節B 済。納品なら prose・本番絵が **確定**。brief で Kindle/EPUB、または明示開始して brief へ書き戻し | EPUB 実ファイル＋形式適合・検証不合格の解消＋人のメタ／読み味確認。公開ステータスは別 |
+| epub（任意） | 節A＋節B 済。納品なら prose・本番絵が **確定**。brief で方式と配信先を選択、または明示開始して brief へ書き戻し | `dist/` のEPUB実ファイル＋方式適合・構造／対象環境／アクセシビリティ検証＋人のメタ／読み味確認。公開ステータスは別 |
 | youtube（任意） | 節A＋節B 済。納品なら本番絵 **確定**（ラフは brief 例外＋目的記録時のみ）。brief で YouTube、または明示開始して brief へ書き戻し | 音声付き動画＋同期表の合否（書き出し動画上）＋人の声／公開判断。公開ステータスは別 |
 
 プロトタイプ目的の試し変換は、納品用の確定条件を満たさなくても **開始**してよい。成果の目的を分けて記録し、納品 `確定` と混同しない。
@@ -80,8 +80,9 @@ description: >-
 - `visual-refs/`（任意）
 - `readthrough.md`
 - `rights.md`（権利追跡＋書き出しチェック。節Bは分岐前確認）
-- `epub/` または EPUB ファイル参照（任意・最終成果はここ）
+- `dist/`（EPUB、PDF、HTML、動画等の最終成果物。brief指定先があればそちら）
 - `youtube/` または動画・読み上げ稿・同期表参照（任意・最終成果はここ）
+- `rendered_pages/` 等の変換中間物（Git除外。最終成果物と混同しない）
 
 ## やらないこと
 

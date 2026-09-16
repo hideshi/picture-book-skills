@@ -8,3 +8,4 @@ projects/**/rough/_prev/
 projects/**/rendered_pages/
 __pycache__/
 *.pyc
+*.epub.tmp
