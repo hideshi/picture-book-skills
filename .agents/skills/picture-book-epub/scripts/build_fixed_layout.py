@@ -70,9 +70,10 @@ def parse_prose(prose_path):
         pages[p_num] = filtered
     return pages
 
-def parse_brief_meta(brief_path):
+def parse_brief_meta(brief_path, project_dir):
     title = "絵本"
     author = "作者"
+    total_pages = 0
     if os.path.exists(brief_path):
         with open(brief_path, "r", encoding="utf-8") as f:
             txt = f.read()
@@ -82,9 +83,24 @@ def parse_brief_meta(brief_path):
         m_auth = re.search(r"##\s*7\.\s*答え責任[^\n]*\n+([^\n\r#]+)", txt)
         if m_auth:
             author = m_auth.group(1).strip()
-    return title, author
+        m_pages = re.search(r"本文\s*[\*]*(\d+)\s*頁", txt)
+        if m_pages:
+            total_pages = int(m_pages.group(1))
 
-def render_pages_to_dir(project_dir, rendered_dir, title, author, total_pages=14):
+    # Fallback: check max page in rough/ or prose.md
+    if total_pages == 0:
+        rough_dir = os.path.join(project_dir, "rough")
+        if os.path.exists(rough_dir):
+            p_files = [f for f in os.listdir(rough_dir) if re.match(r"^p\d+\.png$", f)]
+            if p_files:
+                nums = [int(re.search(r"\d+", f).group(0)) for f in p_files]
+                total_pages = max(nums)
+    if total_pages == 0:
+        total_pages = 14
+
+    return title, author, total_pages
+
+def render_pages_to_dir(project_dir, rendered_dir, title, author, total_pages):
     os.makedirs(rendered_dir, exist_ok=True)
     font_reg_path, font_bold_path = find_font()
     font_text = ImageFont.truetype(font_reg_path, 54)
@@ -337,17 +353,17 @@ def main():
     project_dir = os.path.abspath(project_dir)
 
     brief_path = os.path.join(project_dir, "brief.md")
-    title, author = parse_brief_meta(brief_path)
+    title, author, total_pages = parse_brief_meta(brief_path, project_dir)
 
     rendered_dir = os.path.join(project_dir, "rendered_pages")
     dist_dir = os.path.join(project_dir, "dist")
     out_epub = os.path.join(dist_dir, f"{title}_固定レイアウト版.epub")
 
-    print(f"=== Rendering Fixed-Layout Pages for '{title}' (by {author}) ===")
-    render_pages_to_dir(project_dir, rendered_dir, title, author)
+    print(f"=== Rendering Fixed-Layout Pages for '{title}' (by {author}, {total_pages} pages) ===")
+    render_pages_to_dir(project_dir, rendered_dir, title, author, total_pages)
 
     print(f"=== Packing EPUB3 ===")
-    build_epub_package(rendered_dir, out_epub, title, author)
+    build_epub_package(rendered_dir, out_epub, title, author, total_pages)
 
 if __name__ == "__main__":
     main()
