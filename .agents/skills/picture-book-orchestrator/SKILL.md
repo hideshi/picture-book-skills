@@ -42,7 +42,9 @@ description: >-
 | final-art | **prose・character・rough がすべて確定**（character は N/A 可） | 本番全頁＋チェックログ |
 | readthrough (A) | rough＋仮文が揃う | A 相の記録。致命的は差し戻し |
 | readthrough (B) | final-art＋本文確定 | B 相通過、致命的未解決なし |
-| rights-export | readthrough B 通過（または短いパス例外の記録あり） | 節Aクローズ＋節B（分岐前書き出し）の実ファイル検証。**最終 EPUB／最終動画そのものではない** |
+| content-safety (A) | 仮文＋全頁ラフが揃う | 全頁レビュー＋著者の採否または保留先。指摘ゼロや全修正は要求しない |
+| content-safety (B) | 採用予定の全文＋最終絵・レイアウト | 公開対象の全頁レビュー＋著者の採否または保留先。外部要件の未確認を明示 |
+| rights-export | readthrough B と content-safety B の記録あり（または短いパス例外の記録あり） | 節Aクローズ＋節B（分岐前書き出し）の実ファイル検証。**最終 EPUB／最終動画そのものではない** |
 | epub（任意） | 節A＋節B 済。納品なら prose・本番絵が **確定**。brief で方式と配信先を選択、または明示開始して brief へ書き戻し | `dist/` のEPUB実ファイル＋方式適合・構造／対象環境／アクセシビリティ検証＋人のメタ／読み味確認。公開ステータスは別 |
 | youtube（任意） | 節A＋節B 済。納品なら本番絵 **確定**（ラフは brief 例外＋目的記録時のみ）。brief で YouTube、または明示開始して brief へ書き戻し | 音声付き動画＋同期表の合否（書き出し動画上）＋人の声／公開判断。公開ステータスは別 |
 
@@ -55,8 +57,8 @@ description: >-
 - pagination ⇄ prose ⇄ rough（反復可）。character は rough と並行可
 - rough 途中 → visual-refs（任意）
 - prose+character+rough **確定** → final-art
-- final-art 前または後 → readthrough の相を選ぶ（A＝ラフ段階、B＝本番後）
-- readthrough B 済 → rights-export
+- final-art 前または後 → readthrough と content-safety の相を選ぶ（A＝ラフ段階、B＝本番後。両者の実施順は問わない）
+- readthrough B＋content-safety B 済 → rights-export
 - rights-export 済 → brief の公開チャネルに応じて `picture-book-epub` および／または `picture-book-youtube`（どちらも任意。選ばれていなければここで打ち切り可）
 - 任意工程の不備時の戻り: EPUB レイアウト→epub／TTS・同期→youtube／中身→上流 craft＋要再確認／新規素材権利→rights 節A／チャネル変更→brief
 
@@ -79,6 +81,7 @@ description: >-
 - `rough-notes.md`
 - `visual-refs/`（任意）
 - `readthrough.md`
+- `content-safety.md`
 - `rights.md`（権利追跡＋書き出しチェック。節Bは分岐前確認）
 - `dist/`（EPUB、PDF、HTML、動画等の最終成果物。brief指定先があればそちら）
 - `youtube/` または動画・読み上げ稿・同期表参照（任意・最終成果はここ）

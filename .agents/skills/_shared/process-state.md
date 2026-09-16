@@ -63,7 +63,7 @@ upstream: brief@2026-09-14 確定
    - character は rough / final-art の前提
    - visual-refs は rough 途中でも可
    - final-art 前に prose・character・rough が **確定**
-   - readthrough → rights-export →（任意）epub / youtube
+   - readthrough と content-safety → rights-export →（任意）epub / youtube
 4. 任意公開工程からの典型の戻り先:
    - EPUB のレイアウト／パッケージ不備 → `picture-book-epub`（必要なら構造のみ再変換）
    - TTS・同期・字幕 → `picture-book-youtube`
