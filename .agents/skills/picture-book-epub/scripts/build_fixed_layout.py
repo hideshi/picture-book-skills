@@ -262,7 +262,9 @@ def render_pages(
     cover_canvas.save(rendered_cover)
 
     page_entries: list[tuple[str, Path, str, str, str]] = [
-        ("cover", rendered_cover, "", "表紙", f"{title}の表紙")
+        # Keep the cover as a standalone spread so a right-page click does
+        # not consume an implicit blank half-spread before p_01.
+        ("cover", rendered_cover, "rendition:page-spread-center", "表紙", f"{title}の表紙")
     ]
 
     for page_number in range(1, page_count + 1):
@@ -299,9 +301,13 @@ def render_pages(
     draw.text((round(width * 0.14), y), title, font=ImageFont.truetype(str(bold_font_path), max(24, round(52 * scale))), fill=(30, 30, 30))
     y += round(140 * scale)
     draw.text((round(width * 0.14), y), f"作・構成: {author}", font=colophon_font, fill=(50, 50, 50))
+    # Leave a visibly empty line between the credit and the disclosures.
+    y += round(colophon_font.size * 2.8)
     for line in disclosure:
-        y += round(colophon_font.size * 1.7)
-        for wrapped in wrap_text(draw, line, colophon_font, round(width * 0.72)):
+        y += round(colophon_font.size * 1.0)
+        # Keep the disclosure area wide enough for a short Japanese sentence
+        # to remain on one line; longer disclosures still wrap naturally.
+        for wrapped in wrap_text(draw, line, colophon_font, round(width * 0.76)):
             draw.text((round(width * 0.14), y), wrapped, font=colophon_font, fill=(90, 90, 90))
             y += round(colophon_font.size * 1.4)
     rendered_colophon = rendered_dir / "page_colophon.png"
@@ -407,7 +413,7 @@ def package_epub(
   </ol></nav>
   <nav epub:type="landmarks" hidden=""><h2>ランドマーク</h2><ol>
     <li><a epub:type="cover" href="cover.xhtml">表紙</a></li>
-    <li><a epub:type="bodymatter" href="cover.xhtml">本文開始</a></li>
+    <li><a epub:type="bodymatter" href="cover.xhtml">本文開始（表紙から）</a></li>
   </ol></nav>
 </body>
 </html>"""
@@ -601,7 +607,7 @@ def main() -> None:
     epubcheck_result = run_epubcheck(output, args.require_epubcheck, args.skip_epubcheck)
     print(f"EPUB created: {output}")
     print(f"Art source: {art_dir}")
-    print(f"Pages: {page_count}; viewport: {args.width}x{args.height}; body start: p_01.xhtml")
+    print(f"Pages: {page_count}; viewport: {args.width}x{args.height}; initial page: cover.xhtml")
     print(epubcheck_result)
 
 
