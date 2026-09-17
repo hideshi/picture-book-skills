@@ -52,7 +52,15 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--disclosure", action="append", default=[])
     result.add_argument("--allow-missing-epubcheck", action="store_true")
     result.add_argument("--embed-html-images", action="store_true", help="Make HTML outputs standalone by embedding images")
+    result.add_argument(
+        "--omit-cover-page",
+        "--no-cover-page",
+        action="store_true",
+        dest="omit_cover_page",
+        help="Omit the cover page from EPUB output (for KDP upload)",
+    )
     return result
+
 
 
 def main() -> None:
@@ -128,7 +136,10 @@ def main() -> None:
         for command in commands.values():
             add_common_options(command, args)
         commands["epub"].extend(["--cover-text-mode", args.cover_text_mode])
+        if args.omit_cover_page:
+            commands["epub"].append("--omit-cover-page")
         if args.embed_html_images:
+
             commands["viewer_html"].append("--embed-images")
             commands["spread_html"].append("--embed-images")
         for disclosure in args.disclosure:

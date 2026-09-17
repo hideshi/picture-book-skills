@@ -44,6 +44,7 @@ description: >-
 | readthrough (B) | final-art＋本文確定 | B 相通過、致命的未解決なし |
 | content-safety (A) | 仮文＋全頁ラフが揃う | 全頁レビュー＋著者の採否または保留先。指摘ゼロや全修正は要求しない |
 | content-safety (B) | 採用予定の全文＋最終絵・レイアウト | 公開対象の全頁レビュー＋著者の採否または保留先。外部要件の未確認を明示 |
+| accessibility (A/B)（推奨） | A: ラフ＋仮文 / B: 本番絵＋確定本文 | `accessibility.md` に全頁の画像代替テキスト、色覚・コントラスト確認、W3C/EPUBメタデータを記録し人が確定 |
 | rights-export | readthrough B と content-safety B の記録あり（または短いパス例外の記録あり） | 節Aクローズ＋節B（分岐前書き出し）の実ファイル検証。**最終 EPUB／最終動画そのものではない** |
 | epub（任意） | 節A＋節B 済。納品なら prose・本番絵が **確定**。brief で方式と配信先を選択、または明示開始して brief へ書き戻し | `dist/` のEPUB実ファイル＋方式適合・構造／対象環境／アクセシビリティ検証＋人のメタ／読み味確認。公開ステータスは別 |
 | youtube（任意） | 節A＋節B 済。納品なら本番絵 **確定**（ラフは brief 例外＋目的記録時のみ）。brief で YouTube、または明示開始して brief へ書き戻し | 音声付き動画＋同期表の合否（書き出し動画上）＋人の声／公開判断。公開ステータスは別 |
@@ -82,6 +83,7 @@ description: >-
 - `visual-refs/`（任意）
 - `readthrough.md`
 - `content-safety.md`
+- `accessibility.md`（アクセシビリティ台帳・代替テキストと適合記録）
 - `rights.md`（権利追跡＋書き出しチェック。節Bは分岐前確認）
 - `dist/`（EPUB、PDF、HTML、動画等の最終成果物。brief指定先があればそちら）
 - `youtube/` または動画・読み上げ稿・同期表参照（任意・最終成果はここ）

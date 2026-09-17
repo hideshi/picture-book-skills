@@ -205,6 +205,46 @@ def fit_image(source: Path, max_width: int, max_height: int) -> Image.Image:
     return image.resize(size, Image.Resampling.LANCZOS)
 
 
+def load_accessibility_ledger(path: Path | None) -> tuple[dict[str, str], str | None]:
+    if not path or not path.exists():
+        return {}, None
+    content = path.read_text(encoding="utf-8")
+    alt_map: dict[str, str] = {}
+    summary: str | None = None
+
+    summary_match = re.search(r"schema:accessibilitySummary[^>]*>([^<]+)<", content)
+    if not summary_match:
+        m = re.search(r"(?:要約|概要|Summary)[:：]\s*([^\n]+(?:\n[^\n#|]+)*)", content)
+        if m:
+            summary = " ".join(m.group(1).split())
+    else:
+        summary = summary_match.group(1).strip()
+
+    table_lines = [line.strip() for line in content.splitlines() if line.strip().startswith("|")]
+    if len(table_lines) >= 3:
+        raw_headers = [c.strip().lower() for c in table_lines[0].split("|")[1:-1]]
+        id_col = -1
+        alt_col = -1
+        for idx, h in enumerate(raw_headers):
+            if any(k in h for k in ("頁", "ページ", "page", "id")):
+                id_col = idx
+            elif any(k in h for k in ("代替テキスト", "img_alt", "alt")):
+                alt_col = idx
+        if id_col != -1 and alt_col != -1:
+            for row in table_lines[2:]:
+                cells = [c.strip() for c in row.split("|")[1:-1]]
+                if len(cells) > max(id_col, alt_col):
+                    pid = cells[id_col]
+                    alt = cells[alt_col]
+                    if pid and alt and not pid.startswith("---"):
+                        alt_map[pid] = alt
+                        if (m := re.match(r"^p0*(\d+)$", pid, re.I)):
+                            alt_map[f"p_{int(m.group(1)):02d}"] = alt
+                            alt_map[str(int(m.group(1)))] = alt
+
+    return alt_map, summary
+
+
 def render_pages(
     rendered_dir: Path,
     art_dir: Path,
@@ -220,6 +260,8 @@ def render_pages(
     bold_font_path: Path,
     disclosure: list[str],
     cover_text_mode: str,
+    include_cover_page: bool = True,
+    alt_map: dict[str, str] | None = None,
 ) -> list[tuple[str, Path, str, str, str]]:
     rendered_dir.mkdir(parents=True, exist_ok=True)
     for stale in rendered_dir.glob("page_*.png"):
@@ -261,11 +303,14 @@ def render_pages(
     rendered_cover = rendered_dir / "page_cover.png"
     cover_canvas.save(rendered_cover)
 
-    page_entries: list[tuple[str, Path, str, str, str]] = [
-        # Keep the cover as a standalone spread so a right-page click does
-        # not consume an implicit blank half-spread before p_01.
-        ("cover", rendered_cover, "rendition:page-spread-center", "表紙", f"{title}の表紙")
-    ]
+    page_entries: list[tuple[str, Path, str, str, str]] = []
+    if include_cover_page:
+        cover_alt = (alt_map.get("cover") or alt_map.get("表紙")) if alt_map else None
+        if not cover_alt:
+            cover_alt = f"{title}の表紙"
+        page_entries.append(
+            ("cover", rendered_cover, "rendition:page-spread-center", "表紙", cover_alt)
+        )
 
     for page_number in range(1, page_count + 1):
         canvas = Image.new("RGB", (width, height), BACKGROUND)
@@ -291,8 +336,11 @@ def render_pages(
         rendered = rendered_dir / f"page_{page_number:02d}.png"
         canvas.save(rendered)
         spread = "page-spread-left" if page_number % 2 == 0 else "page-spread-right"
-        spoken = " ".join(prose.get(page_number, []))
-        alt = f"{page_number}ページの挿絵。{spoken}" if spoken else f"{page_number}ページの文字のない挿絵"
+        pid_key = f"p_{page_number:02d}"
+        alt = alt_map.get(pid_key) if alt_map else None
+        if not alt:
+            spoken = " ".join(prose.get(page_number, []))
+            alt = f"{page_number}ページの挿絵。{spoken}" if spoken else f"{page_number}ページの文字のない挿絵"
         page_entries.append((f"p_{page_number:02d}", rendered, spread, f"{page_number}ページ", alt))
 
     colophon = Image.new("RGB", (width, height), BACKGROUND)
@@ -314,8 +362,12 @@ def render_pages(
     colophon.save(rendered_colophon)
     next_number = page_count + 1
     colophon_spread = "page-spread-left" if next_number % 2 == 0 else "page-spread-right"
-    page_entries.append(("colophon", rendered_colophon, colophon_spread, "奥付", f"{title}の奥付。作・構成 {author}"))
+    colophon_alt = (alt_map.get("colophon") or alt_map.get("奥付")) if alt_map else None
+    if not colophon_alt:
+        colophon_alt = f"{title}の奥付。作・構成 {author}"
+    page_entries.append(("colophon", rendered_colophon, colophon_spread, "奥付", colophon_alt))
     return page_entries
+
 
 
 def modified_timestamp(paths: list[Path], requested: str | None) -> str:
@@ -342,6 +394,7 @@ def package_epub(
     width: int,
     height: int,
     progression: str,
+    accessibility_summary: str | None = None,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix="picture-book-epub-") as temporary:
         root = Path(temporary)
@@ -390,7 +443,8 @@ def package_epub(
 </html>"""
             (oebps / f"{page_id}.xhtml").write_text(xhtml, encoding="utf-8")
 
-        body_id = next(page_id for page_id, *_ in entries if page_id.startswith("p_"))
+        has_cover = any(page_id == "cover" for page_id, *_ in entries)
+        body_id = next((page_id for page_id, *_ in entries if page_id.startswith("p_")), entries[0][0])
         toc_items = "\n".join(
             f'      <li><a href="{page_id}.xhtml">{xml(description)}</a></li>'
             for page_id, _, _, description, _ in entries
@@ -400,6 +454,13 @@ def package_epub(
             for page_id, _, _, description, _ in entries
             if page_id.startswith("p_")
         )
+        landmarks = []
+        if has_cover:
+            landmarks.append('    <li><a epub:type="cover" href="cover.xhtml">表紙</a></li>')
+            landmarks.append(f'    <li><a epub:type="bodymatter" href="{body_id}.xhtml">本文開始</a></li>')
+        else:
+            landmarks.append(f'    <li><a epub:type="bodymatter" href="{body_id}.xhtml">本文開始</a></li>')
+        landmarks_xml = "\n".join(landmarks)
         nav = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="{xml(language)}" lang="{xml(language)}">
@@ -412,8 +473,7 @@ def package_epub(
 {page_list}
   </ol></nav>
   <nav epub:type="landmarks" hidden=""><h2>ランドマーク</h2><ol>
-    <li><a epub:type="cover" href="cover.xhtml">表紙</a></li>
-    <li><a epub:type="bodymatter" href="cover.xhtml">本文開始（表紙から）</a></li>
+{landmarks_xml}
   </ol></nav>
 </body>
 </html>"""
@@ -435,6 +495,38 @@ def package_epub(
             spread_property = f' properties="{spread}"' if spread else ""
             spine.append(f'<itemref idref="{page_id}"{spread_property}/>')
 
+        cover_meta = '<meta name="cover" content="img_cover"/>\n    ' if has_cover else ""
+        guide_items = []
+        if has_cover:
+            guide_items.append('    <reference type="cover" title="表紙" href="cover.xhtml"/>')
+        guide_items.append(f'    <reference type="text" title="本文" href="{body_id}.xhtml"/>')
+        guide_xml = "\n".join(guide_items)
+
+        # Accessibility metadata
+        a11y_meta_lines = [
+            '    <meta property="schema:accessMode">textual</meta>',
+            '    <meta property="schema:accessMode">visual</meta>',
+            '    <meta property="schema:accessibilityFeature">alternativeText</meta>',
+            '    <meta property="schema:accessibilityFeature">readingOrder</meta>',
+            '    <meta property="schema:accessibilityFeature">tableOfContents</meta>',
+            '    <meta property="schema:accessibilityFeature">pageNavigation</meta>',
+            '    <meta property="schema:accessibilityHazard">none</meta>',
+            '    <meta property="schema:accessModeSufficient">textual,visual</meta>',
+        ]
+        if accessibility_summary:
+            a11y_meta_lines.append(
+                f'    <meta property="schema:accessibilitySummary">{xml(accessibility_summary)}</meta>'
+            )
+        else:
+            default_summary = (
+                "本作品は固定レイアウト形式の絵本です。すべての挿絵ページに、本文および情景・登場人物の表情・動作を解説した代替テキストが付与されており、"
+                "スクリーンリーダー等の音声読み上げ技術による通読が可能です。文字サイズの拡大・リフローには対応していません。光の点滅等の視覚的危険性はありません。"
+            )
+            a11y_meta_lines.append(
+                f'    <meta property="schema:accessibilitySummary">{xml(default_summary)}</meta>'
+            )
+        a11y_meta_xml = "\n".join(a11y_meta_lines)
+
         package = f"""<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -443,14 +535,14 @@ def package_epub(
     <dc:creator>{xml(author)}</dc:creator>
     <dc:language>{xml(language)}</dc:language>
     <meta property="dcterms:modified">{modified}</meta>
-    <meta name="cover" content="img_cover"/>
-    <meta property="rendition:layout">pre-paginated</meta>
+    {cover_meta}<meta property="rendition:layout">pre-paginated</meta>
     <meta property="rendition:orientation">auto</meta>
     <meta property="rendition:spread">auto</meta>
     <meta name="fixed-layout" content="true"/>
     <meta name="original-resolution" content="{width}x{height}"/>
     <meta name="book-type" content="children"/>
     <meta name="orientation-lock" content="none"/>
+{a11y_meta_xml}
   </metadata>
   <manifest>
     {"".join(manifest)}
@@ -459,8 +551,7 @@ def package_epub(
     {"".join(spine)}
   </spine>
   <guide>
-    <reference type="cover" title="表紙" href="cover.xhtml"/>
-    <reference type="text" title="本文" href="cover.xhtml"/>
+{guide_xml}
   </guide>
 </package>"""
         (oebps / "package.opf").write_text(package, encoding="utf-8")
@@ -533,8 +624,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--modified", help="UTC timestamp: YYYY-MM-DDTHH:MM:SSZ")
     parser.add_argument("--disclosure", action="append", default=[])
     parser.add_argument("--disclosure-file")
+    parser.add_argument(
+        "--omit-cover-page",
+        "--no-cover-page",
+        action="store_true",
+        dest="omit_cover_page",
+        help="Omit the cover page from the EPUB spine and navigation (for stores like KDP that inject covers separately)",
+    )
     parser.add_argument("--require-epubcheck", action="store_true")
     parser.add_argument("--skip-epubcheck", action="store_true")
+    parser.add_argument("--accessibility", help="Path to accessibility.md ledger; defaults to accessibility.md in project directory if present")
     return parser
 
 
@@ -564,6 +663,10 @@ def main() -> None:
     rendered_dir = Path(args.rendered_dir).resolve() if args.rendered_dir else project_dir / "rendered_pages"
     output = Path(args.output).resolve() if args.output else project_dir / "dist" / f"{safe_filename(title)}_固定レイアウト版.epub"
 
+    # Accessibility ledger
+    a11y_path = Path(args.accessibility) if args.accessibility else (project_dir / "accessibility.md")
+    alt_map, a11y_summary = load_accessibility_ledger(a11y_path if a11y_path.exists() else None)
+
     disclosure = list(args.disclosure)
     if args.disclosure_file:
         disclosure_path = Path(args.disclosure_file)
@@ -572,6 +675,8 @@ def main() -> None:
         disclosure.extend(line.strip() for line in read_text(disclosure_path).splitlines() if line.strip())
 
     inputs = [brief_path, prose_path, cover_path, *page_art.values()]
+    if a11y_path.exists():
+        inputs.append(a11y_path)
     modified = modified_timestamp([path for path in inputs if path.exists()], args.modified)
     identifier = args.identifier or f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, title + '|' + author)}"
 
@@ -590,6 +695,8 @@ def main() -> None:
         bold_font,
         disclosure,
         args.cover_text_mode,
+        include_cover_page=not args.omit_cover_page,
+        alt_map=alt_map,
     )
     package_epub(
         entries,
@@ -602,13 +709,16 @@ def main() -> None:
         args.width,
         args.height,
         args.page_progression,
+        accessibility_summary=a11y_summary,
     )
     validate_package(output)
     epubcheck_result = run_epubcheck(output, args.require_epubcheck, args.skip_epubcheck)
     print(f"EPUB created: {output}")
     print(f"Art source: {art_dir}")
-    print(f"Pages: {page_count}; viewport: {args.width}x{args.height}; initial page: cover.xhtml")
+    initial_page = "cover.xhtml" if not args.omit_cover_page else f"{entries[0][0]}.xhtml"
+    print(f"Pages: {page_count}; viewport: {args.width}x{args.height}; initial page: {initial_page}")
     print(epubcheck_result)
+
 
 
 if __name__ == "__main__":
