@@ -63,12 +63,11 @@ upstream: brief@2026-09-14 確定
    - character は rough / final-art の前提
    - visual-refs は rough 途中でも可
    - final-art 前に prose・character・rough が **確定**
-   - readthrough、content-safety、accessibility（相B1） → rights-export →（任意）epub / youtube
+   - readthrough、content-safety、accessibility（相B1） → rights-export →（任意）epub
    - prose / final-art の変更 → accessibility（相B1）を `要再確認`、accessibility の変更 → 下流の EPUB を `要再確認`
 4. 任意公開工程からの典型の戻り先:
    - EPUB のレイアウト／パッケージ・アクセシビリティ不備 → `picture-book-epub`（相B2検証、必要なら構造再変換）
    - 代替テキストや画像説明の不備・追加 → `picture-book-accessibility`（相B1）
-   - TTS・同期・字幕 → `picture-book-youtube`
    - 本文・絵・構成の中身 → 上流の craft 工程へ戻し、当該成果を `要再確認`
    - 工程内で追加・変更した素材の権利 → rights-export 節A
    - 公開チャネル自体の変更 → `picture-book-brief`

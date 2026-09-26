@@ -37,11 +37,10 @@
 | 9b | `picture-book-content-safety` | 二相: 文・絵・組み合わせの子ども向け安全性とコンプライアンス候補。著者が指摘を採否 |
 | 10 | `picture-book-rights-export` | 権利追跡と書き出しチェック |
 | 11 | `picture-book-epub` | （任意）再フローまたは固定レイアウト EPUB。rights-export のあと、brief で方式・配信先を選んだとき |
-| 12 | `picture-book-youtube` | （任意）ページ同期＋TTS の YouTube 向け動画。rights-export のあと |
 
-`rights-export` のあとは **分岐**: 印刷納品のみで終わる／`epub`／`youtube`／両方。brief の公開チャネル（Kindle・YouTube）が開始条件。明示開始した場合は brief へ書き戻す。
+`rights-export` のあとは **分岐**: 印刷納品のみで終わる／`epub`。brief の公開チャネル（Kindle 等）が開始条件。明示開始した場合は brief へ書き戻す。
 
-`rights-export` 節B は **分岐前の確認用書き出し** の検証であり、最終 EPUB／最終動画の完成は各任意工程の完了条件（再フロー適合・同期表の合否・公開ステータスなど）で判定する。成果物の `確定` と公開ステータス（承認／保留／未実施／実施済み）は分ける（`_shared/process-state.md`）。
+`rights-export` 節B は **分岐前の確認用書き出し** の検証であり、最終 EPUB の完成は任意工程の完了条件（再フロー適合・公開ステータスなど）で判定する。成果物の `確定` と公開ステータス（承認／保留／未実施／実施済み）は分ける（`_shared/process-state.md`）。
 
 最終成果物は案件の `dist/` を既定とし、`rendered_pages/`、変換用一時ファイル、キャッシュは中間生成物としてGitから除外する。briefで別の納品先を決めた場合は、その指定と生成記録を優先する。
 
