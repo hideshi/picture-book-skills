@@ -4,6 +4,17 @@
 
 イラストレーターが絵を本体に持ち、文章・構成の不足を AI が足場にする。最終の声・子供向けの適切さ・「これで出す」判断（答え責任）は人が持つ。
 
+## ZIPで落としたとき
+
+GitHub の [Download ZIP](https://github.com/hideshi/picture-book-skills/archive/refs/heads/main.zip) で取得できる。
+
+解凍後のフォルダ名は `picture-book-skills-main` になる。スキル本体は **`.agents/skills/`** にある（各工程の `SKILL.md`）。
+
+注意:
+
+- フォルダ名がドット始まりなので、Mac の Finder などでは隠しフォルダ扱いになり、「中身が空」に見えることがある。表示を切り替えるか、ターミナルや「フォルダへ移動」で `.agents/skills` を直接開く。
+- `.claude/skills` と `.cursor/skills` は `.agents/skills` へのシンボリックリンク。ZIP 展開ではリンクが壊れたり空ファイルに見えることがある。中身を見る・渡すときは `.agents/skills/` を使う。
+
 ## 役割の正本（全工程共通）
 
 | 領域 | 担当 | やること | やらないこと |
