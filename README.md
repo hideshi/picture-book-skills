@@ -12,8 +12,9 @@ GitHub の [Download ZIP](https://github.com/hideshi/picture-book-skills/archive
 
 注意:
 
-- フォルダ名がドット始まりなので、Mac の Finder などでは隠しフォルダ扱いになり、「中身が空」に見えることがある。表示を切り替えるか、ターミナルや「フォルダへ移動」で `.agents/skills` を直接開く。
-- `.claude/skills` と `.cursor/skills` は `.agents/skills` へのシンボリックリンク。ZIP 展開ではリンクが壊れたり空ファイルに見えることがある。中身を見る・渡すときは `.agents/skills/` を使う。
+- フォルダ名がドット始まりなので、Mac の Finder や ChromeOS の Files などでは隠しフォルダ扱いになり、「中身が空」に見えることがある。表示を切り替えるか、パスを直接開く。
+- ChromeOS の Files で「抽出失敗」になる主な原因は、ZIP 内のシンボリックリンクだった。そのため `.claude/skills` と `.cursor/skills` のリンクは置かず、各ディレクトリの README から `.agents/skills/` を指すようにしてある。中身を見る・エージェントに渡すときは `.agents/skills/` を使う。
+- 古い ZIP を持っている場合は、上記リンクを取り直す。
 
 ## 役割の正本（全工程共通）
 
