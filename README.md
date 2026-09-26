@@ -8,13 +8,12 @@
 
 GitHub の [Download ZIP](https://github.com/hideshi/picture-book-skills/archive/refs/heads/main.zip) で取得できる。
 
-解凍後のフォルダ名は `picture-book-skills-main` になる。スキル本体は **`.agents/skills/`** にある（各工程の `SKILL.md`）。
+解凍後のフォルダ名は `picture-book-skills-main` になる。スキル本体の正本は **`.agents/skills/`** にある（各工程の `SKILL.md`）。`.claude/skills` と `.cursor/skills` は、そこへのシンボリックリンク。
 
 注意:
 
-- フォルダ名がドット始まりなので、Mac の Finder や ChromeOS の Files などでは隠しフォルダ扱いになり、「中身が空」に見えることがある。表示を切り替えるか、パスを直接開く。
-- ChromeOS の Files で「抽出失敗」になる主な原因は、ZIP 内のシンボリックリンクだった。そのため `.claude/skills` と `.cursor/skills` のリンクは置かず、各ディレクトリの README から `.agents/skills/` を指すようにしてある。中身を見る・エージェントに渡すときは `.agents/skills/` を使う。
-- 古い ZIP を持っている場合は、上記リンクを取り直す。
+- フォルダ名がドット始まりなので、Mac の Finder などでは隠しフォルダ扱いになり、「中身が空」に見えることがある。表示を切り替えるか、パスを直接開く。
+- Windows / Mac の一般的な解凍で使う想定。シンボリックリンクを展開できない環境では、`.agents/skills/` を直接使えばよい。
 
 ## 役割の正本（全工程共通）
 
