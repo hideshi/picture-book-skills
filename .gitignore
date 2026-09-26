@@ -3,8 +3,7 @@ REVIEW-astra-mid.md
 REVIEW-*.md
 .DS_Store
 
-# 案件成果物は 案件成果物はこのリポに置かない。
-# 誤ってこのリポに projects/ を置いた場合の除外を残す。
+# local project scratch if ever present
 projects/**/rough/_prev/
 projects/**/rendered_pages/
 __pycache__/
